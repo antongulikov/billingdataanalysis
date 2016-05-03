@@ -5,8 +5,7 @@ import sys
 from Person import Person, Event
 from print_path import Location, Point
 from sort_by_day import Reader
-from print_user_path import PathPrinter
-
+from print_user_path import PathPrinter, TimePosition
 
 class Person_oracle:
 
@@ -47,7 +46,24 @@ def test(oracle: Person_oracle, path_printer: PathPrinter):
     for person in oracle:
         way = path_printer.generate_user_path(person)
         if way is not None:
-            with open("./new_data/user_pathes/" + person._user_id+".html", "w") as file:
+            with open("./new_data/user_pathes/" + person._user_id + ".html", "w") as file:
+                file.write(way)
+
+
+# name = ./foo/bar/tmp/*.*.*.csv
+def get_file_name(name: str):
+    tmp = name.split("/")
+    tmp = tmp[-1]
+    return tmp
+
+
+def test2(oracle: Person_oracle, positions_printer: TimePosition):
+    file_name = get_file_name(sys.argv[1])
+    with open("./new_data/positions/" + file_name, "w") as file:
+        file.write("time,lat,lon\n")
+        for person in oracle:
+            way = positions_printer.generate_user_positions(person)
+            if way is not None:
                 file.write(way)
 
 
@@ -57,7 +73,9 @@ def main():
     oracle = Person_oracle(person_file)
     location = Location(location_file)
     path_printer = PathPrinter(location)
-    test(oracle, path_printer)
+    position_printer = TimePosition(location)
+    #test(oracle, path_printer)
+    test2(oracle, position_printer)
 
 if __name__ == "__main__":
     main()

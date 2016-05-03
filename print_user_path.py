@@ -2,6 +2,7 @@ __author__ = 'scorpion'
 
 from Person import Person, Event
 from print_path import Location, Point
+from time_oracle import TimeOracle
 
 
 class PathPrinter:
@@ -30,7 +31,7 @@ class PathPrinter:
                     </body></html>"""
         return result
 
-    def _gen_coordinate(self, point : Point):
+    def _gen_coordinate(self, point: Point):
         return "{lat:" + str(point.get_lat()) + "," + "lng:" + str(point.get_lon()) + "}"
 
     def generate_user_path(self, user: Person):
@@ -50,14 +51,31 @@ class PathPrinter:
             result += symbol + self._gen_coordinate(new_point)
             previous = current_position
         if previous == (0, 0):
-            print(user._user_id)
-            result += "["
+            pass
         result += self._make_tail()
         if previous == (0, 0):
             result = None
         return result
 
 
+class TimePosition:
 
+    def __init__(self, locations: Location):
+        self._location = locations
+        self._time_oracle = TimeOracle()
 
-
+    def generate_user_positions(self, user: Person):
+        result = ""
+        previous = (0, 0)
+        for event in user._events:
+            current_position = event.get_cell_with_lac()
+            new_point = self._location.get_point(*current_position)
+            if new_point is None:
+                continue
+            result += ",".join(list(map(str, [self._time_oracle.get_full_time(event.get_date()),
+                                              new_point.get_lat(), new_point.get_lon()])))
+            result += "\n"
+            previous = current_position
+        if previous == (0, 0):
+            result = None
+        return result

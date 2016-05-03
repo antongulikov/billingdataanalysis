@@ -21,6 +21,9 @@ class Event:
     def get_cell_with_lac(self):
         return int(self._cell_id), int(self._lac)
 
+    def get_date(self):
+        return self._date
+
 
 class Person:
 
