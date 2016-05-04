@@ -53,6 +53,7 @@ class GraphBuilder:
             if previous == current:
                 continue
             previous_number = self._get_vertex_number(*previous)
+            previous = current #!!!!! fuck the police
             self._file.write(str(previous_number) + " " + str(current_number) + "\n")
 
     def __del__(self):
@@ -63,6 +64,7 @@ class GraphBuilder:
 def main():
     file_name = sys.argv[1]
     frequency = int(sys.argv[2]) * 60
+    print(file_name, frequency)
     gb = GraphBuilder(file_name, frequency)
     gb._build_graph()
 
