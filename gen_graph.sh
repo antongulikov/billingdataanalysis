@@ -13,3 +13,7 @@ do
 	python3 graph_builder.py ./new_data/graph/g${i}/g${i} ${i}
 	echo $i
 done
+
+echo "Finish Build"
+
+./gen_top_html
