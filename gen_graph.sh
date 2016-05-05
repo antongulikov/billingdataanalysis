@@ -15,5 +15,3 @@ do
 done
 
 echo "Finish Build"
-
-./gen_top_html
