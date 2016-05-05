@@ -30,6 +30,7 @@ const int maxn = (int)3e6 + 10;
 int ptr[maxn], used[maxn], level[maxn];
 int count_iteration = 0;
 vector < int > g[maxn];
+vector < int > d[maxn];
 
 struct edge {
     int v, u, f, c, id, inv;
@@ -37,6 +38,7 @@ struct edge {
             v(v), u(u), f(f), c(c), id(id), inv(inv)
     {
         edges_positions[{v, u}] = id;
+        d[v].push_back(u);
     }
 
     bool operator < (const edge &other) const {
@@ -44,13 +46,16 @@ struct edge {
     }
 };
 
-vector < edge> edges;
+vector < edge > edges;
+
 
 void add_edge(int from, int to) {
     if (!edges_positions.count({from, to})) {
         int size_edge = (int)edges.size();
         edges.push_back(edge{from, to, 0, 1, size_edge, size_edge + 1});
         edges.push_back(edge{to, from, 0, 0, size_edge + 1, size_edge});
+        g[from].push_back(size_edge);
+        g[to].push_back(size_edge + 1);
     } else {
         int pos = edges_positions[{from, to}];
         edges[pos].c++;
@@ -68,9 +73,25 @@ void read_graph() {
     N += 10;
 }
 
+void dfs(int v) {
+    used[v] = 1;
+    for (auto x : d[v]) {
+        if (used[x] == 0) {
+            dfs(x);
+        }
+    }
+}
+
+bool is_connected(int v, int u) {
+    for (int i = 0; i < N; i++)
+        used[i] = 0;
+    dfs(v);
+    return used[u];
+}
+
 bool find_new_path(int flow, int begin, int end) {
     count_iteration++;
-    queue < int> q;
+    queue < int > q;
     used[begin] = count_iteration;
     level[begin] = 0;
     q.push(begin);
@@ -99,7 +120,7 @@ bool push_flow(int v, int flow, int begin, int end) {
     for (; ptr[v] < int(g[v].size()); ptr[v]++) {
         int edge_id = g[v][ptr[v]];
         edge& current_edge = edges[edge_id];
-        if (level[v] + 1 == current_edge.u && current_edge.c - current_edge.f >= flow &&
+        if (level[v] + 1 == level[current_edge.u] && current_edge.c - current_edge.f >= flow &&
                 push_flow(current_edge.u, flow, begin, end)) {
             current_edge.f += flow;
             edges[current_edge.inv].f -= flow;
@@ -111,6 +132,12 @@ bool push_flow(int v, int flow, int begin, int end) {
 
 void make_flow(int begin, int end) {
     int ans = 0;
+    /*for (auto val : edges) {
+        if (val.v == begin) {
+            cerr << val.c << endl;
+        }
+    }*/
+    cerr << is_connected(begin, end) << " " << begin << " " << end << endl;
     for (int flow = (1 << 30); flow > 0; flow >>= 1) {
         while (find_new_path(flow, begin, end)) {
             for (int i = 0; i < N; i++)
@@ -122,12 +149,16 @@ void make_flow(int begin, int end) {
             }
         }
     }
+    cerr << "Flow is " << ans << endl;
+    cout << ans << endl;
 }
 
 void print_top_edges(int cnt) {    
-    sort(edges.begin(), edges().end());
-    reverse(edges.begin(), edges().end());
-    for (int i = 0; i < min(cnt, (int)edges.size(); i++) {
+    sort(edges.begin(), edges.end());
+    reverse(edges.begin(), edges.end());
+    for (int i = 0; i < min(cnt, (int)edges.size()); i++) {
+        if (edges[i].f == 0)
+            continue;
         cout << edges[i].v << " " << edges[i].u << " " << edges[i].f << " " << edges[i].c << " " << (double)edges[i].f / (double)edges[i].c << endl;
     }    
 }
@@ -135,11 +166,11 @@ void print_top_edges(int cnt) {
 int main(int argc, char **argv) {
     ios_base :: sync_with_stdio(false);
     cin.tie(0);
-    int s_flow = atoi(argv[4]);
-    int f_flow = atoi(argv[5]);
-    int line_to_print = atoi(argv[3]);
+    int s_flow = atoi(argv[3]);
+    int f_flow = atoi(argv[4]);
+    int line_to_print = 100;
     string in_file_name = string(argv[1]) + ".graph";
-    string out_file_name = string(argv[2]) + "/top_flow" + from_int_to_str(line_to_print) + ".data";
+    string out_file_name = string(argv[2]) + "/flow_data/top_flow_" + from_int_to_str(s_flow) + "_" + from_int_to_str(f_flow) + ".data";
     cerr << in_file_name << endl << out_file_name << endl;
     freopen(in_file_name.c_str(), "r", stdin);
     freopen(out_file_name.c_str(), "w", stdout);
