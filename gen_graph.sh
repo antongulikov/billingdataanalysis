@@ -3,7 +3,7 @@
 echo "Start"
 
 
-values=(1 2 3 5 10 20 30 60 1440)
+values=(1 2 3 5 10 20 30 40 60 80 100 120 1440)
 
 for i in "${values[@]}"
 do

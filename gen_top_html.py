@@ -20,6 +20,8 @@ def gen_number():
         cnt += 1
         yield cnt
 
+
+
 HEADER = """<!DOCTYPE html><html><head>
                     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
                     <meta charset="utf-8"><title>Top_edges</title>
