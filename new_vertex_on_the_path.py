@@ -74,7 +74,7 @@ def build_pathes_with_new_points(fl_r: Reader, de_r: Reader, in_r: Reader, out_f
             file.write(" ".join(list(map(str, [x[0][0], x[0][1], x[1]]))) + "\n")
     with open(desc_out_file, "w") as file:
         for key, value in map_p._map.items():
-            file.write(" ".join(list(map(str, [value, key[0], key[1]]))))
+            file.write(" ".join(list(map(str, [value, key[0], key[1]]))) + "\n")
 
 
 def main():

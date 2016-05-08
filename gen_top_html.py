@@ -33,16 +33,21 @@ HEADER = """<!DOCTYPE html><html><head>
                     zoom: 10, center: myLatLng });"""
 
 
+def new_path(num, cor_from, cor_to, color):
+    ret = "var flights{}=".format(num)
+    ret += "[" + "{lat:" + str(cor_from[0]) + ",lng:" + str(cor_from[1])+"},"+\
+           "{lat:" + str(cor_to[0]) + ",lng:" + str(cor_to[1]) + "}];\n"
+    ret += "var fpath{}".format(num) + \
+           " = new google.maps.Polyline({path: flights" + str(num) +\
+           ",geodesic: true,strokeColor: '#" +\
+           str(color) + """',strokeOpacity: 1.0, map: map,strokeWeight: 2 });""" + "\n"
+    return ret
+
+
 def add_new(cor_from, cor_to, file):
     all = next(gen_number())
-    file.write("var flights{}=".format(all))
-    file.write("[" +
-               "{lat:" + str(cor_from[0]) + ",lng:" + str(cor_from[1])+"}," +
-               "{lat:" + str(cor_to[0]) + ",lng:" + str(cor_to[1]) + "}];\n")
-    file.write("var fpath{}".format(all) + " = new google.maps.Polyline({path: flights" + str(all) +
-               ",geodesic: true,strokeColor: '#" + generate_random_color() +
-               """',strokeOpacity: 1.0, map: map,
-                    strokeWeight: 2 });""" + "\n")
+    ret = new_path(all, cor_from, cor_to, generate_random_color())
+    file.write(ret)
 
 
 def build_html(descr: Reader, top: Reader, file):
