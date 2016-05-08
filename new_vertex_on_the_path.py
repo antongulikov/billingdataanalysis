@@ -26,7 +26,8 @@ def build_path(lst_vertex):
     return ret
 
 
-def build_pathes_with_new_points(fl_r: Reader, de_r: Reader, in_r: Reader, out_file_name: str):
+def build_pathes_with_new_points(fl_r: Reader, de_r: Reader, in_r: Reader, out_file_name: str,
+                                 desc_out_file: str):
     from_de_file = {}
     map_p = Position()
     pathes = defaultdict(list)
@@ -68,8 +69,12 @@ def build_pathes_with_new_points(fl_r: Reader, de_r: Reader, in_r: Reader, out_f
         path = pathes[(p_s1, p_f1)]
         for vert in path:
             ret_edges.append((vert, cost))
-    for x in ret_edges:
-        print(x[0], x[1])
+    with open(out_file_name, "w") as file:
+        for x in ret_edges:
+            file.write(" ".join(list(map(str, [x[0][0], x[0][1], x[1]]))) + "\n")
+    with open(desc_out_file, "w") as file:
+        for key, value in map_p._map.items():
+            file.write(" ".join(list(map(str, [value, key[0], key[1]]))))
 
 
 def main():
@@ -77,10 +82,11 @@ def main():
     desc_filename = sys.argv[2]
     inter_filename = sys.argv[3]
     out_file = sys.argv[4]
+    desc_out_file = sys.argv[5]
     fl_r = Reader(flow_filename)
     de_r = Reader(desc_filename)
     in_r = Reader(inter_filename)
-    build_pathes_with_new_points(fl_r, de_r, in_r, out_file)
+    build_pathes_with_new_points(fl_r, de_r, in_r, out_file, desc_out_file)
 
 if __name__ == "__main__":
     main()
