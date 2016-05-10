@@ -1,7 +1,4 @@
-import pandas as pd
-import numpy as np
-import os
-import sys
+__author__ = 'scorpion'
 
 
 class Reader:
@@ -46,36 +43,24 @@ class Reader:
         self._in.close()
 
 
-# <codecell>
-
 def main():
-    reader = Reader("./new_data/user_activities.csv")
-
-    print(reader.get_line())
-
-    open_files = []
-    desc_files = {}
-
-    ret = reader.get_line()
-    cnt = 0
-    while ret is not None:
-        cnt += 1
-        if cnt % 100000 == 0:
-            print(cnt, ret)
-        date = ret[0].split()[0]
-        ret[0] = ret[0].split()[1]
-        if not date in open_files:
-            open_files.append(date)
-            os.open("./new_data/days/" + date + ".csv", os.O_CREAT | os.O_RDWR)
-            file_ = open("./new_data/days/" + date + ".csv", "w")
-            desc_files[date] = file_
-            file_.write("date,type,cell_id,lac,user_id\n")
-        fi = desc_files[date]
-        fi.write(",".join(ret) + "\n")
-        ret = reader.get_line()
-
-    for fi in desc_files.values():
-        fi.close()
+    in_file = "YOUR FILE"
+    rd = Reader(in_file)
+    header = rd.get_line()
+    pattern = "new_anna{}.csv"
+    cnt = 3
+    pos = 0
+    file = open(pattern.format(pos), "w")
+    file.write(header + "\n")
+    for line in rd:
+        if cnt == 0:
+            file.close()
+            pos += 1
+            file = open(pattern.format(pos), "w")
+            file.write(header + "\n")
+        else:
+            file.write(",".join(list(map(str, line))) + "\n")
+            cnt -= 1
 
 
 if __name__ == "__main__":
