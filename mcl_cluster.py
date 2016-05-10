@@ -3,12 +3,14 @@ __author__ = 'scorpion'
 from graph import Graph
 from sort_by_day import Reader
 import sys
+from draw_top_places import HEAD, TAIL, add_marker
+from gen_top_html import generate_random_color
 
 
 class Mcl:
     def __init__(self, g: Graph):
         self._edges = self._do_clustering(g._adjacency)
-        self._n = len(g._adjacency)
+        self._n = len(g._distance)
         self._edge_list = self._build_edge_list(self._edges, self._n)
         self._redge_list = self._rlist(self._edges)
         self._used = [False for j in range(self._n)]
@@ -29,6 +31,9 @@ class Mcl:
         for i in range(n):
             for j in range(n):
                 sum[j] += matrix[i][j]
+        for j in range(n):
+            if sum[j] < 1e-5:
+                sum[j] = 1.
         for i in range(n):
             for j in range(n):
                 ret_matrix[i][j] = ret_matrix[i][j] / sum[j]
@@ -56,20 +61,23 @@ class Mcl:
         for j in range(n):
             matrix[j][j] = 1
         matrix = self._normalize(matrix)
-        for _iterate in range(10):
+ #       for x in matrix:
+  #              print(x)
+        #exit(0)
+        for _iterate in range(11):
             print(_iterate)
             matrix = self._mult(matrix, matrix)
-            matrix = self._inflate(matrix, 2)
+            matrix = self._inflate(matrix, 3)
             matrix = self._normalize(matrix)
-            for x in matrix:
-                print(x)
-            print("---------")
+            #for x in matrix:
+#                print(x)
+#            print("---------")
         edges_ret = []
         for i in range(n):
             for j in range(n):
-                if matrix[i][j] > 0.7:
+                if matrix[i][j] > 0.9:
                     edges_ret.append((i, j))
-        print(len(edges_ret))
+   #     print(len(edges_ret))
         return edges_ret
 
     def _build_edge_list(self, edges, n):
@@ -106,12 +114,15 @@ class Mcl:
                 self._tmp_set = set()
                 self._dfs_reverse(x)
                 new_set = set()
+     #           print("start{}".format(x))
                 for x in self._tmp_set:
                     for u in self._edge_list[x]:
                         self._used[u] = True
-                        print("from {} to {}".format(x, u))
+    #                    print("from {} to {}".format(x, u))
                         new_set.add(u)
                     new_set.add(x)
+                if len(new_set) == 1:
+                    continue
                 clusters.append([x for x in new_set])
 
         return clusters
@@ -122,7 +133,16 @@ def main():
     in_d = sys.argv[2]
     gr = Graph(Reader(in_r), Reader(in_d))
     clusters = Mcl(gr)
-    print(len(clusters._clusters))
+    out_f = sys.argv[3]
+    with open(out_f, "w") as html_file:
+        dif = 0
+        html_file.write(HEAD + "\n")
+        for cluster in clusters._clusters:
+            color = generate_random_color()
+            for x in cluster:
+                dif += 1
+                html_file.write(add_marker(dif, gr._position[x], color) + "\n")
+        html_file.write(TAIL)
 
 if __name__ == "__main__":
     main()

@@ -16,8 +16,8 @@ class Graph:
     def _read_edges(self, edge_reader: Reader):
         edges = []
         for line in edge_reader:
-            u, v, _ = list(map(int, line[0].split(" ")))
-            edges.append((u, v))
+            u, _ = list(map(int, line[0].split(" ")))
+            edges.append((u, u))
         return edges
 
     def _read_position(self, desc_reader: Reader):
@@ -46,8 +46,12 @@ class Graph:
     def _buildd(self):
         matrix = [[0 for _1 in range(self._N + 1)] for _2 in range(self._N + 1)]
         for (u, v) in self._edge_list:
-            matrix[u][v] = self._distance(self._position[u], self._position[v])
-            matrix[v][u] = matrix[u][v]
+            for (u1, v1) in self._edge_list:
+                matrix[u][u1] = self._distance(self._position[u], self._position[u1])
+                matrix[u1][u] = matrix[u][u1]
+                if matrix[u][u1] < 0.007:
+                    self._adjacency[u][u1] = 1
+                    self._adjacency[u1][u] = 1
         return matrix
 
 
